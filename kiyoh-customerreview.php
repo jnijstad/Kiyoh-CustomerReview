@@ -152,7 +152,7 @@ function kiyoh_register_settings() {
 }
 
 function kiyoh_create_menu() {
-	add_menu_page('Kiyoh Customerreview Settings', 'Kiyoh Settings', 'administrator', __FILE__, 'kiyoh_settings_page','', 10);
+	add_options_page('Kiyoh Customerreview Settings', 'Kiyoh Settings', 'administrator', __FILE__, 'kiyoh_settings_page','', 90);
 	add_action( 'admin_init', 'kiyoh_register_settings' );
 }
 add_action('admin_menu', 'kiyoh_create_menu');
