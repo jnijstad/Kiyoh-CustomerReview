@@ -24,7 +24,7 @@ if (is_plugin_active('woocommerce/woocommerce.php')) {
 	$kiyoh_options = kiyoh_getOption();
 	if ($kiyoh_options['enable'] == 'Yes') {
 		$delay = time() + $kiyoh_options['delay'] * 24 * 3600;
-		if ( !is_admin() ) {	
+		if ( !is_admin() ) {
 			$url = trim(strip_tags($_SERVER['REQUEST_URI']));
 			if ($kiyoh_options['event'] == 'Purchase') {
 				$order_id = 0;
@@ -50,7 +50,7 @@ if (is_plugin_active('woocommerce/woocommerce.php')) {
 								require_once plugin_dir_path( dirname(__FILE__) ) . '/woocommerce/includes/abstracts/abstract-wc-order.php';
 								require_once plugin_dir_path( dirname(__FILE__) ) . '/woocommerce/includes/class-wc-order.php';
 
-								$order = new WC_Order($order_id);	
+								$order = new WC_Order($order_id);
 								$email = $order->billing_email;
                                 if(!$email) return;
 								$optionsSendMail = array('option' => $kiyoh_options, 'email' => $email);
@@ -70,8 +70,8 @@ if (is_plugin_active('woocommerce/woocommerce.php')) {
 							}
 						}
 					}
-				}				
-			}	
+				}
+			}
 		}
 		add_action("save_post", "check_kiyoh_review", 10, 1);
 	}//if ($kiyoh_options['enable'] == 'Yes')
@@ -80,14 +80,14 @@ if (is_plugin_active('woocommerce/woocommerce.php')) {
 function check_kiyoh_review($post_id) {
 	$kiyoh_options = kiyoh_getOption();
 	$order = new WC_Order($post_id);
-	$status = $order->get_status(); 	
+	$status = $order->get_status();
 	$email = $order->billing_email;
     if(!$email) return;
 	$status_old = trim(strip_tags($_POST['post_status']));
 	$status_old = str_replace('wc-', '', $status_old);
 
-	if ($status    == 'pending'	  || $status == 'processing' 	|| $status == 'on-hold' 
-		|| $status == 'completed' || $status == 'cancelled' 	|| $status == 'fraud' 
+	if ($status    == 'pending'	  || $status == 'processing' 	|| $status == 'on-hold'
+		|| $status == 'completed' || $status == 'cancelled' 	|| $status == 'fraud'
 		|| $status == 'refunded'  || $status == 'failed') {
 
 		//check change status, check excule_groups
@@ -130,7 +130,7 @@ function enqueue_my_scripts()
 }
 add_action('admin_init', 'enqueue_my_scripts');
 
-function register_mysettings() {
+function kiyoh_register_settings() {
 	register_setting( 'kiyoh-settings-group', 'kiyoh_option_enable' );
 	register_setting( 'kiyoh-settings-group', 'kiyoh_option_link' );
 	register_setting( 'kiyoh-settings-group', 'kiyoh_option_email' );
@@ -150,13 +150,13 @@ function register_mysettings() {
     //register_setting( 'kiyoh-settings-group', 'kiyoh_option_enable_microdata' );
     //register_setting( 'kiyoh-settings-group', 'kiyoh_option_company_id' );
 }
- 
+
 function kiyoh_create_menu() {
 	add_menu_page('Kiyoh Customerreview Settings', 'Kiyoh Settings', 'administrator', __FILE__, 'kiyoh_settings_page','', 10);
-	add_action( 'admin_init', 'register_mysettings' );
+	add_action( 'admin_init', 'kiyoh_register_settings' );
 }
 add_action('admin_menu', 'kiyoh_create_menu');
- 
+
 function kiyoh_settings_page() {
 ?>
 <div class="wrap">
