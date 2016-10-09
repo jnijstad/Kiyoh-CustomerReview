@@ -18,7 +18,7 @@ jQuery( document ).ready(function() {
     // Prevents error: An invalid form control with name='' is not focusable.
     jQuery("form#kiyoh_customerreview_settings").find('#submit').on('click',function(event) {
       var $hiddenInputs = jQuery("form#kiyoh_customerreview_settings").find(':input[required]:hidden')
-      // $hiddenInputs.prop("disabled", true);
+      $hiddenInputs.prop("disabled", true);
     });
 });
 function toogleStatus (speed) {
