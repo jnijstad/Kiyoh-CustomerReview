@@ -167,7 +167,7 @@ function kiyoh_settings_page() {
 			<p><strong><?php _e('Settings saved.') ?></strong></p>
 		</div>
 	<?php } ?>
-	<form method="post" action="options.php">
+	<form method="post" id="kiyoh_customerreview_settings" action="options.php">
 		<?php settings_fields( 'kiyoh-settings-group' ); ?>
 		<table class="form-table">
             <tr valign="top">
