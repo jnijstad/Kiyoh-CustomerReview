@@ -147,8 +147,8 @@ function kiyoh_register_settings() {
     register_setting( 'kiyoh-settings-group', 'kiyoh_option_connector' );
     register_setting( 'kiyoh-settings-group', 'kiyoh_option_custom_user' );
     register_setting( 'kiyoh-settings-group', 'kiyoh_option_email_template_language' );
-    //register_setting( 'kiyoh-settings-group', 'kiyoh_option_enable_microdata' );
-    //register_setting( 'kiyoh-settings-group', 'kiyoh_option_company_id' );
+    register_setting( 'kiyoh-settings-group', 'kiyoh_option_enable_microdata' );
+    register_setting( 'kiyoh-settings-group', 'kiyoh_option_company_id' );
 }
 
 function kiyoh_create_menu() {
@@ -310,23 +310,23 @@ function kiyoh_settings_page() {
                     </select>
                 </td>
             </tr>
-            <!--<tr valign="top" class="kiyohserver">
+            <tr valign="top" class="kiyohserver">
                 <th scope="row">Enable Microdata functionality</th>
                 <td>
                     <select name="kiyoh_option_enable_microdata">
-                        <option value="Yes" <?php /*selected(get_option('kiyoh_option_enable_microdata'), 'Yes'); */?>>Yes</option>
-                        <option value="No" <?php /*selected(get_option('kiyoh_option_enable_microdata'), 'No'); */?>>No</option>
+                        <option value="Yes" <?php selected(get_option('kiyoh_option_enable_microdata'), 'Yes'); ?>>Yes</option>
+                        <option value="No" <?php selected(get_option('kiyoh_option_enable_microdata'), 'No'); ?>>No</option>
                     </select>
                     <p>Enable a microdata rating widget.</p>
                 </td>
-            </tr>-->
-            <!--<tr valign="top" class="kiyohserver">
+            </tr>
+            <tr valign="top" class="kiyohserver">
                 <th scope="row">Company Id</th>
                 <td>
-                    <p><input type="text" name="kiyoh_option_company_id" value="<?php /*echo get_option('kiyoh_option_company_id'); */?>"/></p>
+                    <p><input type="text" name="kiyoh_option_company_id" value="<?php echo get_option('kiyoh_option_company_id'); ?>"/></p>
                     <p>Enter here your "Company Id" as registered in your KiyOh account. </p>
                 </td>
-            </tr>-->
+            </tr>
 			<?php if (kiyoh_checkExistsTable('groups_group') && is_plugin_active('groups/groups.php')) : ?>
 			<tr valign="top">
 				<th scope="row">Exclude customer groups</th>
@@ -358,3 +358,66 @@ function register_kiyoh_review() {
     register_widget( 'kiyoh_review' );
 }
 add_action( 'widgets_init', 'register_kiyoh_review' );
+
+/**
+ * Detect if microdate is enabled and if there's a company id.
+ */
+function is_kiyoh_microdata_enabled() {
+  $kiyoh_options = kiyoh_getOption();
+  $enable_microdata = (!empty($kiyoh_options['company_id']) && $kiyoh_options['enable_microdata'] == "Yes") ? true : false;
+  return $enable_microdata;
+}
+
+
+/**
+ * Updates the values in the options
+ */
+function update_kiyoh_ratings() {
+  $kiyoh_options = kiyoh_getOption();
+  $company_id = $kiyoh_options['company_id'];
+  $kiyohWidget = new kiyoh_review; //using the prev dev's class to get data.
+  $data = $kiyohWidget->receiveData($company_id);
+  $total_score = (string) $data->company->total_score;
+  $total_reviews = (string) $data->company->total_reviews;
+  $org_name = (string) $data->company->name;
+  update_option( 'kiyoh_org_name', $org_name);
+  update_option( 'kiyoh_total_score', $total_score);
+  update_option( 'kiyoh_total_reviews', $total_reviews);
+}
+
+/**
+ * Schedule cronjob to retrieve latest ratings and store them as an option
+ */
+if (is_kiyoh_microdata_enabled()) {
+  if( !wp_next_scheduled( 'get_latest_kiyoh_ratings' ) ) {
+     wp_schedule_event( time(), 'twicedaily', 'get_latest_kiyoh_ratings' );
+  }
+  add_action( 'get_latest_kiyoh_ratings', 'update_kiyoh_ratings' );
+}
+
+/**
+ * Add JSON-LD schema to footer
+ */
+function add_kiyoh_schema_to_footer(){
+  if (is_kiyoh_microdata_enabled()) {
+    ?>
+      <script type="application/ld+json">
+        {
+          "@context": "http://schema.org",
+          "@type": "Organization",
+          "name" : "<?php echo get_option('kiyoh_org_name'); ?>",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "<?php echo get_option('kiyoh_total_score'); ?>",
+            "bestRating": "10",
+            "worstRating": "1",
+            "ratingCount": "<?php echo get_option('kiyoh_total_reviews'); ?>"
+          }
+        }
+      </script>
+    <?php
+  }
+}
+add_action( 'wp_footer', 'add_kiyoh_schema_to_footer');
+
+

@@ -68,7 +68,7 @@ class kiyoh_review extends WP_Widget {
 		$border 	= $instance['border'];
 		$language 	= $instance['language'];
 
-		
+
 		if ($language == "English") {
 			$language = ($language == "English") ? 'com' : 'nl';
 		}
@@ -114,7 +114,7 @@ class kiyoh_review extends WP_Widget {
 		<label for="<?php echo $this->get_field_id( 'height' ); ?>">Height(px)</label>
 		<input id="<?php echo $this->get_field_id( 'height'); ?>" name="<?php echo $this->get_field_name( 'height' ); ?>" value="<?php echo esc_attr($height); ?>" type="text" style="width:100%;" /><br>
 	</p>
-	
+
 	<p style="padding: 0 0 10px;">
 		<label for="<?php echo $this->get_field_id( 'ssl' ); ?>">SSL</label>
 		<select id="<?php echo $this->get_field_id("ssl"); ?>" name="<?php echo $this->get_field_name("ssl"); ?>">
