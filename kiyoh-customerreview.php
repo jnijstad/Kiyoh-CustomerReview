@@ -143,12 +143,14 @@ function kiyoh_register_settings() {
 	register_setting( 'kiyoh-settings-group', 'kiyoh_option_tmpl_du' );
 	register_setting( 'kiyoh-settings-group', 'kiyoh_option_excule' );
 	register_setting( 'kiyoh-settings-group', 'kiyoh_option_company_name' );
-    register_setting( 'kiyoh-settings-group', 'kiyoh_option_send_method' );
-    register_setting( 'kiyoh-settings-group', 'kiyoh_option_connector' );
-    register_setting( 'kiyoh-settings-group', 'kiyoh_option_custom_user' );
-    register_setting( 'kiyoh-settings-group', 'kiyoh_option_email_template_language' );
-    register_setting( 'kiyoh-settings-group', 'kiyoh_option_enable_microdata' );
-    register_setting( 'kiyoh-settings-group', 'kiyoh_option_company_id' );
+  register_setting( 'kiyoh-settings-group', 'kiyoh_option_send_method' );
+  register_setting( 'kiyoh-settings-group', 'kiyoh_option_connector' );
+  register_setting( 'kiyoh-settings-group', 'kiyoh_option_custom_user' );
+  register_setting( 'kiyoh-settings-group', 'kiyoh_option_email_template_language' );
+  register_setting( 'kiyoh-settings-group', 'kiyoh_option_enable_microdata' );
+  register_setting( 'kiyoh-settings-group', 'kiyoh_option_company_id' );
+  register_setting( 'kiyoh-settings-group', 'kiyoh_option_rating_page' );
+
 }
 
 function kiyoh_create_menu() {
@@ -327,6 +329,21 @@ function kiyoh_settings_page() {
                     <p>Enter here your "Company Id" as registered in your KiyOh account. </p>
                 </td>
             </tr>
+            <tr valign="top" class="kiyohserver">
+                <th scope="row">Select Page To add schema data</th>
+                <td>
+                    <select name="kiyoh_option_rating_page">
+                    		 <option value=""><?php echo esc_attr( __( 'Select page' ) ); ?></option>
+                    		 <?php $pages = get_pages(); ?>
+                    		 <?php foreach ( $pages as $page ): ?>
+                    		  	<option <?php selected(get_option('kiyoh_option_rating_page'), $page->ID); ?> value="<?php echo $page->ID; ;?>">
+                    		  	<?php echo $page->post_title; ?>
+                    		  	</option>
+                    		 <?php endforeach; ?>
+                    </select>
+                    <p>Select Page To add schema data.</p>
+                </td>
+            </tr>
 			<?php if (kiyoh_checkExistsTable('groups_group') && is_plugin_active('groups/groups.php')) : ?>
 			<tr valign="top">
 				<th scope="row">Exclude customer groups</th>
@@ -399,7 +416,7 @@ if (is_kiyoh_microdata_enabled()) {
  * Add JSON-LD schema to footer
  */
 function add_kiyoh_schema_to_footer(){
-  if (is_kiyoh_microdata_enabled()) {
+  if (is_kiyoh_microdata_enabled() && is_page(get_option('kiyoh_option_rating_page'))) {
     ?>
       <script type="application/ld+json">
         {
